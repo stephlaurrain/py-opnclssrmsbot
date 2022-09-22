@@ -1,1 +1,1 @@
-python3 menu.py default desktop
+python3 menu.py default

@@ -1,9 +1,0 @@
-{
-    "python.defaultInterpreterPath": "src/env/bin/python3",    
-    "python.linting.enabled": true,
-    "python.linting.flake8Enabled": true,
-    "python.formatting.provider": "black",
-    "editor.rulers": [
-        79
-    ]
-}

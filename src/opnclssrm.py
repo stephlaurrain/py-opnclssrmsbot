@@ -51,12 +51,13 @@ class Bot:
                 #element =self.driver.find_element(By.XPATH,mypath)     
                 mypath='//*[@id="scheduled"]/section/ol/li'
                 rootel =self.driver.find_elements(By.XPATH,mypath)
-
+                print(f"rootel={rootel}")
                 for el in rootel:
-                        # print(el.text)
-                        # href=el.get_attribute('href')
-                        # print(f'href={href}')
+                        print(el)
+                        href=el.get_attribute('href')
+                        print(f'href={href}')
                         #eval=el.find_element(By.XPATH,'//a')
+                        """
                         eval=el.find_element(By.TAG_NAME,'a')
                         #//*[@id="scheduled"]/section/ol/li[1]/a
                         evallink=eval.get_attribute('href')
@@ -79,6 +80,7 @@ class Bot:
                         # dashboard /html/body/div[3]/div[2]/main/div[4]/div/div[2]/main/div[2]/section/section/ol/li[1]/a/div[3]/div/a                                
                         # lien href et texte nom prénom
                         #lien session /html/body/div[3]/div[2]/main/div[4]/div/div[2]/main/div[2]/section/section/ol/li[1]/a/div[4]/a
+                        """
                         
                 #print(f"hopla {str(rootel)}")
                 
@@ -107,12 +109,6 @@ class Bot:
                 print("send_keys")
                 element.send_keys (password)
 
-                                                         
-                       
-     
-                        
-        
-
         # init
         @_trace_decorator        
         @_error_decorator(do_raise=True)
@@ -136,8 +132,7 @@ class Bot:
                 options.add_argument(f"user-agent={self.jsprms.prms['user_agent']}")
                 options.add_argument("--start-maximized")
                 driver = webdriver.Chrome(executable_path=self.chromedriver_bin_path, options=options)
-                # anti bot detection
-                # driver.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36'})
+                # anti bot detection                
                 driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
                 # resout le unreachable
                 driver.set_window_size(1900, 1080)
@@ -192,26 +187,33 @@ class Bot:
                 pass                                                         
         
 
-        def main(self, command="",param="", param2="", param3=""):
+        def main(self, command="",jsonfile="", param2="", param3=""):
                           
                 try:
                        
                         # InitBot
                         # args
-                        nbargs = len(sys.argv)
-                        command = "test" if (nbargs == 1) else sys.argv[1]                        
-                        # json parameters from file
-                        jsonfile = "default" if (nbargs < 3) else sys.argv[2].lower()          
-                        param = "default" if (nbargs < 4) else sys.argv[3].lower()                
-                        print(f"command={command}") 
-                        print(command)
+                        if command == "":
+                                nb_args = len(sys.argv)
+                                command = "test" if (nb_args == 1) else sys.argv[1]
+                                # fichier json en param
+                                jsonfile = "default" if (nb_args < 3) else sys.argv[2].lower()                                
+                                param1 = "default" if (nb_args < 4) else sys.argv[3].lower()
+                                param2 = "default" if (nb_args < 5) else sys.argv[4].lower()
+                                param3 = "default" if (nb_args < 6) else sys.argv[5].lower()      
+                                print("params=", command, jsonfile, param1, param2)
+                        # logs
+                        print(command)  
                         self.initmain(jsonfile)
                         #Test
-                        command="getsessions"     
+                        # command="getsessions"     
                         
-                        
+                        if (command=="simplyconnect"):   
+                                self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')
+                                input("wait 4 key")
                         if (command=="login"):   
-                                self.login(self.jsprms.prms['login'],self.jsprms.prms['password'])                                
+                                self.login(self.jsprms.prms['login'],self.jsprms.prms['password'])  
+                                input("wait 4 key")                              
                         if (command=="dash"):          
                                 self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/sessions')
                         if (command=="booked"):          
@@ -238,12 +240,14 @@ class Bot:
 
                 except KeyboardInterrupt:
                         print("==>> Interrupted <<==")
+                        self.driver.close()
                         pass
                 except Exception as e:
                         print("==>> GLOBAL MAIN EXCEPTION <<==")
                         self.log.errlg(e)                       
                         return False
                 finally:
+                        self.driver.close()
                         print("==>> DONE <<==")
 
 

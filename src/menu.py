@@ -49,14 +49,14 @@ jsonfilefromarg = "default" if (nbargs == 1) else sys.argv[1]
 
 clear()
 
-bot = Bot()
-bot.initmain('default')
+
 while True:
     print(drkcol("\nHi Neo, I'm the OpenClassrooms bot"))
     print(drkcol("Your wish is my order\n"))
     print(drkcol("What I can do for you :\n"))
 
     menulist = []
+    menulist.append(Menuitem("simplyconnect", "simply connect", 0, jsonfilefromarg, False))
     menulist.append(Menuitem("login", "login to OpnClssrms", 0, jsonfilefromarg, False))
     menulist.append(Menuitem("dash", "dashboard", 0, jsonfilefromarg, False))
     menulist.append(Menuitem("booked", "planifiees", 0, jsonfilefromarg, False))
@@ -94,7 +94,7 @@ while True:
         os.system("nano data/default.json")    
     if dothat == "99":
         print(drkcol("\nsee you soon, Neo\n"))
-        del bot
+        # del bot
         gc.collect
         quit()
     try:
@@ -110,9 +110,9 @@ while True:
                 prmcmdlist.append(input(drkcol(f"enter param {i} :")))
             prm2 = "" if (len(prmcmdlist) < 1) else prmcmdlist[0]
             prm3 = "" if (len(prmcmdlist) < 2) else prmcmdlist[1]
-
+            bot = Bot()
             bot.main(cmd, item.jsonfile, prm2, prm3)
-
+            del bot
     except Exception as e:
         print (e)
         print(f"\n{hardgreen}bad command (something went wrong){normalcolor}\n")
