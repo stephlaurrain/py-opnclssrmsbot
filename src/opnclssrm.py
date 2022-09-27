@@ -43,12 +43,9 @@ class Bot:
                 self.driver.execute_script("window.open('{0}');".format(url))
                 self.driver.switch_to.window(self.driver.window_handles[-1]) 
 
-        
-
         @_trace_decorator        
         @_error_decorator()
-        def getsessions(self):                
-                
+        def getsessions(self):                                
                 url_base = get_url(self.jsprms.prms['urls'],'base')
                 url_mentorship = get_url(self.jsprms.prms['urls'],'dashboard')
                 self.driver.get(f"{url_mentorship.replace('[base]', url_base)}")
@@ -62,14 +59,14 @@ class Bot:
                 def sort_by_key(list):
                         return list['startDate']
                 events=sorted(events,key=sort_by_key, reverse=False)  
-                tpl_report = f"{self.root_app}{os.path.sep}data{os.path.sep}tpl{os.path.sep}report.txt"     
-                tpl_message = f"{self.root_app}{os.path.sep}data{os.path.sep}tpl{os.path.sep}message.txt"       
+                tpl_report = f"{self.root_app}{os.path.sep}data{os.path.sep}tpl{os.path.sep}report.tpl"     
+                tpl_message = f"{self.root_app}{os.path.sep}data{os.path.sep}tpl{os.path.sep}message.tpl"       
                 cpt = 0
                 resrep =''
                 for event in events:                        
                         truedate = datetime.strptime(event['startDate'].replace('+0000',''),"%Y-%m-%dT%H:%M:%S")
                         truedate = truedate + timedelta(hours=offset_hour)
-                        truedate_as_str = truedate.strftime("%d-%m-%Y à %H:%M h")
+                        truedate_as_str = truedate.strftime("%d-%m-%Y à %H:%Mh")
                         if datetime.now() <= truedate:
                                 id_mentoring = event['id'].split('-')[1]
                                 # print(id_mentoring) # print(event['type']) # print(event['startDate']) # print(truedate)
@@ -184,17 +181,8 @@ class Bot:
                                 print(e)  
                         mypath=input("Enter xpath : ")
 
-
-        @_trace_decorator        
-        @_error_decorator(do_raise=True)
-        def template(self, login, password):               
-                pass                                                         
-        
-
         def main(self, command="",jsonfile="", param2="", param3=""):
-                          
                 try:
-                       
                         # InitBot
                         # args
                         if command == "":
@@ -209,38 +197,27 @@ class Bot:
                         # logs
                         print(command)  
                         self.initmain(jsonfile)
-
                         self.humanize = Humanize(self.trace, self.log, self.jsprms.prms['offset_wait'], self.jsprms.prms['wait'], self.jsprms.prms['default_wait'])
                         self.dojs = Dojs(self.trace, self.log, self.jsprms, self.driver, self.humanize)
                         #Test
                         # command="getsessions"                
-                                
                         if (command=="simplyconnect"):   
                                 self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')                        
                         if (command=="getsessions"):
                                 self.getsessions()
-                                
                         if (command=="login"):   
                                 self.login(self.jsprms.prms['login'],self.jsprms.prms['password'])  
-                        
                         if (command=="dash"):          
                                 self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/sessions')
                         if (command=="booked"):          
                                 self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')
-                 
                         if (command=="testpath"):
                                 self.testpath()
-                        input("wait 4 key")
+                        # input("wait 4 key")
                         # planifiées
                         # https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions
                         # à compléter
                         # https://openclassrooms.com/fr/mentorship/dashboard/sessions
-
-
-                        #self.openmyadmin()    
-                        #self.openbo()                 
-                        
-                        
                         ##)  
 
                         #ONGLETS

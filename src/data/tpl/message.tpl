@@ -12,7 +12,7 @@ $visio_url
 
 si tu rencontres le moindre problème pour te connecter, ou si tu ne me vois pas, tiens moi au courant
 
-A tout à l'heure
+À tout à l'heure
 
 Stéphane
 
