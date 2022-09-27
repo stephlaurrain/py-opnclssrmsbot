@@ -1,8 +1,0 @@
-
-    $pseudo
-    $city
-    $age
-    $in_contact
-    
-        $img
-    

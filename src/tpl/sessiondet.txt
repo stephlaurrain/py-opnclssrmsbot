@@ -1,6 +1,0 @@
-    
-        $rescontact        
-        $typelib ($type)
-        $datetime
-        $from
-        
