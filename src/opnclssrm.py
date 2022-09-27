@@ -49,7 +49,9 @@ class Bot:
         def getsessions(self):
                 self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')
                 WebDriverWait(self.driver, 15).until(EC.presence_of_element_located((By.ID, 'scheduled')))      
-                self.dojs.get_events()                                  
+                # self.dojs.get_events()                                  
+                # self.dojs.get_sessions()
+                self.dojs.get_mentorings(1836277)
                        
         
 
@@ -178,6 +180,7 @@ class Bot:
                                 self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')                        
                         if (command=="getsessions"):
                                 self.getsessions()
+                                
                         if (command=="login"):   
                                 self.login(self.jsprms.prms['login'],self.jsprms.prms['password'])  
                         

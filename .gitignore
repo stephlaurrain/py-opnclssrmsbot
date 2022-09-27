@@ -150,3 +150,6 @@ trsh
 kept
 src/commands
 tampermonkey
+src/result.json
+src/resultsessions.json
+src/resultmentorings.json
