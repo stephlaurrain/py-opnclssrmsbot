@@ -4,8 +4,9 @@ import os
 from os import path
 import sys
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import sleep
+import inspect
 
 from warnings import catch_warnings
 # mes libs
@@ -15,8 +16,8 @@ import utils.file_utils as file_utils
 from utils.mydecorators import _error_decorator, _trace_decorator
 import utils.jsonprms as jsonprms
 from utils.humanize import Humanize
+from dojs import Dojs
 
-import inspect
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
@@ -26,9 +27,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from string import Template
 from selenium.webdriver.common.keys import Keys
-
-from dojs import Dojs
-from utils.humanize import Humanize
+from utils.urls import get_url
 
 class Bot:
       
@@ -44,14 +43,64 @@ class Bot:
                 self.driver.execute_script("window.open('{0}');".format(url))
                 self.driver.switch_to.window(self.driver.window_handles[-1]) 
 
+        
+
         @_trace_decorator        
         @_error_decorator()
-        def getsessions(self):
-                self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')
+        def getsessions(self):                
+                
+                url_base = get_url(self.jsprms.prms['urls'],'base')
+                url_mentorship = get_url(self.jsprms.prms['urls'],'dashboard')
+                self.driver.get(f"{url_mentorship.replace('[base]', url_base)}")
                 WebDriverWait(self.driver, 15).until(EC.presence_of_element_located((By.ID, 'scheduled')))      
-                # self.dojs.get_events()                                  
+                limit = self.jsprms.prms['mentoring_nb']
+                offset_hour = self.jsprms.prms['offset_hour']
+                date_filter = (datetime.now()- timedelta(hours=offset_hour)).strftime("%Y-%m-%dT%H:%M:%S")
+                # print(date_filter)
+                events = self.dojs.get_events()
+                # print(events)
+                
+                def sort_by_key(list):
+                        return list['startDate']
+                events=sorted(events,key=sort_by_key, reverse=False)  
+                
+                tpl_message = f"{self.root_app}{os.path.sep}data{os.path.sep}tpl{os.path.sep}sessions.txt"          
+                cpt = 0
+                for event in events:                        
+                        truedate = datetime.strptime(event['startDate'].replace('+0000',''),"%Y-%m-%dT%H:%M:%S")
+                        truedate = truedate + timedelta(hours=offset_hour)
+                        truedate_as_str = truedate.strftime("%d-%m-%Y à %H:%M h")
+                        if datetime.now() <= truedate:
+                                
+                                id_mentoring = event['id'].split('-')[1]
+                                print(id_mentoring)
+                                # print(event['type'])                        
+                                # print(event['startDate'])
+                                # print(truedate)
+                                student = event['attendees'][0]                        
+                                # print(student['displayName'])
+                                # print(student['email'])
+                                # print(student['firstName'])
+                                # print(student['lastName'])                        
+                                # print('##################')
+                                mentoring = self.dojs.get_mentorings(id_mentoring)    
+                                visio_id = mentoring['videoConference']['id']                           
+                                # print(mentoring['videoConference']['id'])                                
+                                visio_url = get_url(self.jsprms.prms['urls'], 'meet').replace('[base]', url_base)
+                                visio_url = visio_url.replace ('[id]', visio_id)                              
+                                with open(tpl_message, 'r') as f:                                                                        
+                                        messtmpl = Template(f.read())
+                                        resmess = messtmpl.substitute(student, event_type=event['type'], visio_url=visio_url, truedate=truedate_as_str)
+                                        print(resmess)
+                                if cpt == limit:
+                                        break;
+                                cpt +=1
+                        
+                        
+
                 # self.dojs.get_sessions()
-                self.dojs.get_mentorings(1836277)
+                
+                # self.dojs.get_mentorings(1836277)
                        
         
 
