@@ -1,0 +1,14 @@
+
+Bonjour $apprenant,
+
+voici le lien de notre réunion de $heure sur OpenClassrooms :
+
+$lien
+
+si tu rencontres le moindre problème pour te connecter, ou si tu ne me vois pas, tiens moi au courant
+
+A tout à l'heure
+
+Stéphane
+
+laurrains@gmail.com

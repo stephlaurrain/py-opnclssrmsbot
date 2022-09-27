@@ -27,6 +27,8 @@ from selenium.common.exceptions import NoSuchElementException
 from string import Template
 from selenium.webdriver.common.keys import Keys
 
+from dojs import Dojs
+from utils.humanize import Humanize
 
 class Bot:
       
@@ -46,47 +48,8 @@ class Bot:
         @_error_decorator()
         def getsessions(self):
                 self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')
-                WebDriverWait(self.driver, 15).until(EC.presence_of_element_located((By.ID, 'scheduled')))                        
-                #mypath='//section[@id="scheduled"]/section/ol/li/a/div[4]/a'
-                #element =self.driver.find_element(By.XPATH,mypath)     
-                mypath='//*[@id="scheduled"]/section/ol/li'
-                rootel =self.driver.find_elements(By.XPATH,mypath)
-                print(f"rootel={rootel}")
-                for el in rootel:
-                        print(el)
-                        href=el.get_attribute('href')
-                        print(f'href={href}')
-                        #eval=el.find_element(By.XPATH,'//a')
-                        """
-                        eval=el.find_element(By.TAG_NAME,'a')
-                        #//*[@id="scheduled"]/section/ol/li[1]/a
-                        evallink=eval.get_attribute('href')
-                        print(f'href eval={evallink}')
-                        #typesession=el.find_element(By.XPATH,'//p')
-                        typesession=el.find_element(By.TAG_NAME,'p')
-                        typesessiontxt=typesession.text
-                        print(f'type session={typesessiontxt}')
-                        sessionhour=el.find_element(By.XPATH,'//a/div[2]/p/time')
-                        sessionhourtext=sessionhour.text
-                        print(f'session hour={sessionhourtext}')
-                        dashboardlink=el.find_element(By.XPATH,'//a/div[3]/div/a')
-                        dashboardlinkhref=dashboardlink.get_attribute('href')
-                        print(f'dashboardlink href={dashboardlinkhref}')
-                        studentname =dashboardlink.text
-                        print(f'studentname={studentname}')
-                        sessionlink=el.find_element(By.XPATH,'//a/div[4]/a')
-                        sessionlinkhref=sessionlink.get_attribute('href')
-                        print(f'session link={sessionlinkhref}')
-                        # dashboard /html/body/div[3]/div[2]/main/div[4]/div/div[2]/main/div[2]/section/section/ol/li[1]/a/div[3]/div/a                                
-                        # lien href et texte nom prénom
-                        #lien session /html/body/div[3]/div[2]/main/div[4]/div/div[2]/main/div[2]/section/section/ol/li[1]/a/div[4]/a
-                        """
-                        
-                #print(f"hopla {str(rootel)}")
-                
-                
-                #href=rootel.get_attribute('href')
-                #print(f'href={href}')
+                WebDriverWait(self.driver, 15).until(EC.presence_of_element_located((By.ID, 'scheduled')))      
+                self.dojs.get_events()                                  
                        
         
 
@@ -116,8 +79,8 @@ class Bot:
                 options = webdriver.ChromeOptions()
                 if (self.jsprms.prms['headless']):
                         options.add_argument("--headless")
-                else:
-                        options.add_argument("user-data-dir=./chromeprofile")
+                #else:
+                options.add_argument("user-data-dir=./chromeprofile")
                 # anti bot detection
                 options.add_argument('--disable-blink-features=AutomationControlled')
                 options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -159,7 +122,7 @@ class Bot:
                         self.test = self.jsprms.prms['test']
                         self.remove_logs()
                         self.log.lg("=Here I am=")                
-                        self.driver = self.init()      
+                        self.driver = self.init()                              
                 except Exception as e:
                         self.log.errlg(f"Wasted ! : {e}")
                         raise                         
@@ -205,24 +168,27 @@ class Bot:
                         # logs
                         print(command)  
                         self.initmain(jsonfile)
+
+                        self.humanize = Humanize(self.trace, self.log, self.jsprms.prms['offset_wait'], self.jsprms.prms['wait'], self.jsprms.prms['default_wait'])
+                        self.dojs = Dojs(self.trace, self.log, self.jsprms, self.driver, self.humanize)
                         #Test
-                        # command="getsessions"     
-                        
+                        # command="getsessions"                
+                                
                         if (command=="simplyconnect"):   
-                                self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')
-                                input("wait 4 key")
+                                self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')                        
+                        if (command=="getsessions"):
+                                self.getsessions()
                         if (command=="login"):   
                                 self.login(self.jsprms.prms['login'],self.jsprms.prms['password'])  
-                                input("wait 4 key")                              
+                        
                         if (command=="dash"):          
                                 self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/sessions')
                         if (command=="booked"):          
                                 self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')
-                        if (command=="getsessions"):
-                                self.getsessions()
+                 
                         if (command=="testpath"):
                                 self.testpath()
-                        
+                        input("wait 4 key")
                         # planifiées
                         # https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions
                         # à compléter

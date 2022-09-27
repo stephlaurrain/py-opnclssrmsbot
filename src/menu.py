@@ -57,10 +57,11 @@ while True:
 
     menulist = []
     menulist.append(Menuitem("simplyconnect", "simply connect", 0, jsonfilefromarg, False))
+    menulist.append(Menuitem("getsessions", "get sessions elements", 0, jsonfilefromarg, False))
     menulist.append(Menuitem("login", "login to OpnClssrms", 0, jsonfilefromarg, False))
     menulist.append(Menuitem("dash", "dashboard", 0, jsonfilefromarg, False))
     menulist.append(Menuitem("booked", "planifiees", 0, jsonfilefromarg, False))
-    menulist.append(Menuitem("getsessions", "get sessions elements", 0, jsonfilefromarg, False))
+
 
     menulist.append(Menuitem("test", "test", 0, jsonfilefromarg, False))
 
