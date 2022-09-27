@@ -58,51 +58,41 @@ class Bot:
                 date_filter = (datetime.now()- timedelta(hours=offset_hour)).strftime("%Y-%m-%dT%H:%M:%S")
                 # print(date_filter)
                 events = self.dojs.get_events()
-                # print(events)
-                
+                # print(events)                
                 def sort_by_key(list):
                         return list['startDate']
                 events=sorted(events,key=sort_by_key, reverse=False)  
-                
-                tpl_message = f"{self.root_app}{os.path.sep}data{os.path.sep}tpl{os.path.sep}sessions.txt"          
+                tpl_report = f"{self.root_app}{os.path.sep}data{os.path.sep}tpl{os.path.sep}report.txt"     
+                tpl_message = f"{self.root_app}{os.path.sep}data{os.path.sep}tpl{os.path.sep}message.txt"       
                 cpt = 0
+                resrep =''
                 for event in events:                        
                         truedate = datetime.strptime(event['startDate'].replace('+0000',''),"%Y-%m-%dT%H:%M:%S")
                         truedate = truedate + timedelta(hours=offset_hour)
                         truedate_as_str = truedate.strftime("%d-%m-%Y à %H:%M h")
                         if datetime.now() <= truedate:
-                                
                                 id_mentoring = event['id'].split('-')[1]
-                                print(id_mentoring)
-                                # print(event['type'])                        
-                                # print(event['startDate'])
-                                # print(truedate)
+                                # print(id_mentoring) # print(event['type']) # print(event['startDate']) # print(truedate)
                                 student = event['attendees'][0]                        
-                                # print(student['displayName'])
-                                # print(student['email'])
-                                # print(student['firstName'])
-                                # print(student['lastName'])                        
-                                # print('##################')
+                                # print(student['displayName']) # print(student['email']) # print(student['firstName']) # print(student['lastName'])                                                        
                                 mentoring = self.dojs.get_mentorings(id_mentoring)    
                                 visio_id = mentoring['videoConference']['id']                           
                                 # print(mentoring['videoConference']['id'])                                
                                 visio_url = get_url(self.jsprms.prms['urls'], 'meet').replace('[base]', url_base)
                                 visio_url = visio_url.replace ('[id]', visio_id)                              
-                                with open(tpl_message, 'r') as f:                                                                        
-                                        messtmpl = Template(f.read())
-                                        resmess = messtmpl.substitute(student, event_type=event['type'], visio_url=visio_url, truedate=truedate_as_str)
-                                        print(resmess)
+                                with open(tpl_report, 'r') as f:                                                                        
+                                        reptmpl = Template(f.read())
+                                        with open(tpl_message, 'r') as f:                                                                        
+                                                messtmpl = Template(f.read())
+                                                resmess = messtmpl.substitute(student, event_type=event['type'], visio_url=visio_url, truedate=truedate_as_str)
+                                                # print(resmess)
+                                        resrep += reptmpl.substitute(message=resmess)
                                 if cpt == limit:
                                         break;
                                 cpt +=1
-                        
-                        
-
-                # self.dojs.get_sessions()
-                
-                # self.dojs.get_mentorings(1836277)
-                       
-        
+                        res_file = f"{self.root_app}{os.path.sep}data{os.path.sep}results.txt"
+                        with open(res_file, "w") as text_file:
+                                text_file.write(resrep)
 
         @_trace_decorator        
         @_error_decorator()
