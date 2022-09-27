@@ -145,7 +145,6 @@ src/data/results.txt
 src/chromeprofile
 src/log
 src/data/conf/default.json
-src/js
 trsh
 kept
 src/commands
