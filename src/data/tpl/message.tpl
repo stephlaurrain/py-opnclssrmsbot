@@ -3,6 +3,7 @@ $email
 
 $displayName
 
+OpenClassrooms : lien visio
 
 Bonjour $firstName,
 
@@ -17,3 +18,6 @@ si tu rencontres le moindre problème pour te connecter, ou si tu ne me vois pas
 Stéphane
 
 laurrains@gmail.com
+
+
+Sent from my PyOpnclssrm Bot
