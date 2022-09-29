@@ -6,11 +6,10 @@ from datetime import datetime
 
 
 class Menuitem:
-    def __init__(self, command, label, nbparams, jsonfile, ret):
+    def __init__(self, command, label, nbparams, ret):
         self.command = command
         self.label = label
         self.nbparams = nbparams
-        self.jsonfile = jsonfile
         self.ret = ret
 
 rootApp = os.getcwd()
@@ -49,21 +48,22 @@ jsonfilefromarg = "default" if (nbargs == 1) else sys.argv[1]
 
 clear()
 
-
+bot = Bot()
+bot.initmain(jsonfilefromarg)
 while True:
     print(drkcol("\nHi Neo, I'm the OpenClassrooms bot"))
     print(drkcol("Your wish is my order\n"))
     print(drkcol("What I can do for you :\n"))
 
     menulist = []
-    menulist.append(Menuitem("simplyconnect", "simply connect", 0, jsonfilefromarg, False))
-    menulist.append(Menuitem("getsessions", "get sessions elements", 0, jsonfilefromarg, False))
-    menulist.append(Menuitem("login", "login to OpnClssrms", 0, jsonfilefromarg, False))
-    menulist.append(Menuitem("dash", "dashboard", 0, jsonfilefromarg, False))
-    menulist.append(Menuitem("booked", "planifiees", 0, jsonfilefromarg, False))
+    menulist.append(Menuitem("simplyconnect", "simply connect", 0, False))
+    menulist.append(Menuitem("getsessions", "get sessions elements", 0, False))
+    menulist.append(Menuitem("login", "login to OpnClssrms", 0, False))
+    menulist.append(Menuitem("dash", "dashboard", 0, False))
+    menulist.append(Menuitem("booked", "planifiees", 0, False))
 
 
-    menulist.append(Menuitem("test", "test", 0, jsonfilefromarg, False))
+    menulist.append(Menuitem("test", "test", 0, False))
 
     for idx, menuitem in enumerate(menulist):
         print (mencol(idx, menuitem.command, menuitem.label))
@@ -95,7 +95,8 @@ while True:
         os.system("nano data/default.json")    
     if dothat == "99":
         print(drkcol("\nsee you soon, Neo\n"))
-        # del bot
+        bot.driver.close()
+        del bot
         gc.collect
         quit()
     try:
@@ -111,9 +112,10 @@ while True:
                 prmcmdlist.append(input(drkcol(f"enter param {i} :")))
             prm2 = "" if (len(prmcmdlist) < 1) else prmcmdlist[0]
             prm3 = "" if (len(prmcmdlist) < 2) else prmcmdlist[1]
-            bot = Bot()
-            bot.main(cmd, item.jsonfile, prm2, prm3)
-            del bot
+            
+            
+            bot.main(cmd, jsonfilefromarg, prm2, prm3)
+            
     except Exception as e:
         print (e)
         print(f"\n{hardgreen}bad command (something went wrong){normalcolor}\n")
