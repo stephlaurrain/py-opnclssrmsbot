@@ -27,7 +27,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from string import Template
 from selenium.webdriver.common.keys import Keys
-from utils.urls import get_url
+from utils.urls import Urls
 
 class Bot:
       
@@ -46,9 +46,8 @@ class Bot:
         @_trace_decorator        
         @_error_decorator()
         def getsessions(self):                                
-                url_base = get_url(self.jsprms.prms['urls'],'base')
-                url_mentorship = get_url(self.jsprms.prms['urls'],'dashboard')
-                self.driver.get(f"{url_mentorship.replace('[base]', url_base)}")
+                url_dashboard = Template(self.urls.get_url('dashboard')).substitute(base=self.urls.get_url('base'))
+                self.driver.get(url_dashboard)
                 WebDriverWait(self.driver, 15).until(EC.presence_of_element_located((By.ID, 'scheduled')))      
                 limit = self.jsprms.prms['mentoring_nb']
                 offset_hour = self.jsprms.prms['offset_hour']
@@ -74,9 +73,8 @@ class Bot:
                                 # print(student['displayName']) # print(student['email']) # print(student['firstName']) # print(student['lastName'])                                                        
                                 mentoring = self.dojs.get_mentorings(id_mentoring)    
                                 visio_id = mentoring['videoConference']['id']                           
-                                # print(mentoring['videoConference']['id'])                                
-                                visio_url = get_url(self.jsprms.prms['urls'], 'meet').replace('[base]', url_base)
-                                visio_url = visio_url.replace ('[id]', visio_id)                              
+                                # print(mentoring['videoConference']['id'])   
+                                visio_url = Template(self.urls.get_url('meet')).substitute(base=self.urls.get_url('base'),id=visio_id)                                
                                 with open(tpl_report, 'r') as f:                                                                        
                                         reptmpl = Template(f.read())
                                         with open(tpl_message, 'r') as f:                                                                        
@@ -90,12 +88,16 @@ class Bot:
                         res_file = f"{self.root_app}{os.path.sep}data{os.path.sep}results.txt"
                         with open(res_file, "w") as text_file:
                                 text_file.write(resrep)
+                self.driver.execute_script(f"window.open('file:{res_file}','_blank');");
+                self.driver.find_element_by_tag_name('body').send_keys(Keys.COMMAND + 't') 
+                self.driver.get(f'file:{res_file}')
+                # You can use (Keys.CONTROL + 't') on other OSs
 
         @_trace_decorator        
         @_error_decorator()
         def login(self, login, password):
-                
-                self.driver.get("https://openclassrooms.com/fr/login")                        
+                url = Template(self.urls.get_url('login')).substitute(base=self.urls.get_url('base'))
+                self.driver.get(url)                        
                 self.waithuman(2,5)                                          
                 # accepter cookies
                 #body > div:nth-child(16) > div.mainContent > div > div.pdynamicbutton > a.call
@@ -168,7 +170,8 @@ class Bot:
         @_trace_decorator        
         @_error_decorator(do_raise=True)
         def testpath(self):
-                self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')
+                url = Template(self.urls.get_url('dashboard')).substitute(base=self.urls.get_url('base')) 
+                self.driver.get(url)
                 mypath=input("Enter xpath : ")
                 while mypath !="":
                         try:
@@ -196,24 +199,28 @@ class Bot:
                                 print("params=", command, jsonfile, param1, param2)
                         # logs
                         print(command)  
-                        self.initmain(jsonfile)
+                        # self.initmain(jsonfile)
                         self.humanize = Humanize(self.trace, self.log, self.jsprms.prms['offset_wait'], self.jsprms.prms['wait'], self.jsprms.prms['default_wait'])
-                        self.dojs = Dojs(self.trace, self.log, self.jsprms, self.driver, self.humanize)
+                        self.urls = Urls(self.jsprms.prms['urls'])                        
+                        self.dojs = Dojs(self.trace, self.log, self.jsprms, self.driver, self.humanize, self.urls)
                         #Test
                         # command="getsessions"                
                         if (command=="simplyconnect"):   
-                                self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')                        
+                                url = Template(self.urls.get_url('dashboard')).substitute(base=self.urls.get_url('base'))   
+                                self.driver.get(url)
                         if (command=="getsessions"):
                                 self.getsessions()
                         if (command=="login"):   
                                 self.login(self.jsprms.prms['login'],self.jsprms.prms['password'])  
-                        if (command=="dash"):          
-                                self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/sessions')
+                        if (command=="dash"):
+                                url = Template(self.urls.get_url('dashboard')).substitute(base=self.urls.get_url('base'))
+                                self.driver.get(url)
                         if (command=="booked"):          
-                                self.driver.get('https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions')
+                                url = Template(self.urls.get_url('dashboard')).substitute(base=self.urls.get_url('base'))  
+                                self.driver.get(url)
                         if (command=="testpath"):
                                 self.testpath()
-                        # input("wait 4 key")
+                        input("wait 4 key")
                         # planifiées
                         # https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions
                         # à compléter
@@ -225,14 +232,14 @@ class Bot:
 
                 except KeyboardInterrupt:
                         print("==>> Interrupted <<==")
-                        self.driver.close()
+                        
                         pass
                 except Exception as e:
                         print("==>> GLOBAL MAIN EXCEPTION <<==")
                         self.log.errlg(e)                       
                         return False
                 finally:
-                        self.driver.close()
+                        # self.driver.close()
                         print("==>> DONE <<==")
 
 
