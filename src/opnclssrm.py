@@ -89,7 +89,7 @@ class Bot:
                         with open(res_file, "w") as text_file:
                                 text_file.write(resrep)
                 self.driver.execute_script(f"window.open('file:{res_file}','_blank');");
-                self.driver.find_element_by_tag_name('body').send_keys(Keys.COMMAND + 't') 
+                self.driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.COMMAND + 't') 
                 self.driver.get(f'file:{res_file}')
                 # You can use (Keys.CONTROL + 't') on other OSs
 
@@ -102,13 +102,13 @@ class Bot:
                 # accepter cookies
                 #body > div:nth-child(16) > div.mainContent > div > div.pdynamicbutton > a.call
                         
-                element = self.driver.find_element_by_id('fielduserEmail')
+                element = self.driver.find_element(By.ID, 'fielduserEmail')
                 element.send_keys (login)
-                element = self.driver.find_element_by_id("continue-button")
+                element = self.driver.find_element(By.ID, "continue-button")
                 print("ici")
                 element.click(); 
                 print("avant field")
-                element = self.driver.find_element_by_id('field_password')
+                element = self.driver.find_element(By.ID, 'field_password')
                 print("send_keys")
                 element.send_keys (password)
 
@@ -203,15 +203,19 @@ class Bot:
                         self.humanize = Humanize(self.trace, self.log, self.jsprms.prms['offset_wait'], self.jsprms.prms['wait'], self.jsprms.prms['default_wait'])
                         self.urls = Urls(self.jsprms.prms['urls'])                        
                         self.dojs = Dojs(self.trace, self.log, self.jsprms, self.driver, self.humanize, self.urls)
+
+                       
                         #Test
                         # command="getsessions"                
                         if (command=="simplyconnect"):   
                                 url = Template(self.urls.get_url('dashboard')).substitute(base=self.urls.get_url('base'))   
+                                # print(url)
                                 self.driver.get(url)
                         if (command=="getsessions"):
                                 self.getsessions()
                         if (command=="login"):   
-                                self.login(self.jsprms.prms['login'],self.jsprms.prms['password'])  
+                                # self.login(self.jsprms.prms['login'],self.jsprms.prms['password'])  
+                                self.dojs.login(self.jsprms.prms['login'],self.jsprms.prms['password'])  
                         if (command=="dash"):
                                 url = Template(self.urls.get_url('dashboard')).substitute(base=self.urls.get_url('base'))
                                 self.driver.get(url)
@@ -219,7 +223,7 @@ class Bot:
                                 url = Template(self.urls.get_url('dashboard')).substitute(base=self.urls.get_url('base'))  
                                 self.driver.get(url)
                         if (command=="testpath"):
-                                self.testpath()
+                                self.testpath()                    
                         input("wait 4 key")
                         # planifiées
                         # https://openclassrooms.com/fr/mentorship/dashboard/booked-mentorship-sessions

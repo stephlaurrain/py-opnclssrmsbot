@@ -62,4 +62,20 @@ class Dojs:
                 file_utils.str_to_textfile("resultmentorings.json", json.dumps(res))
                 return res
         
-     
+        
+        @_trace_decorator    
+        @_error_decorator()
+        def login(self, login, password):
+                urlbase = Template(self.urls.get_url('login')).substitute(base=self.urls.get_url('base'))
+                self.driver.get(urlbase)
+                url = Template(self.urls.get_url('login_check')).substitute(base=self.urls.get_url('base'))
+                
+                self.humanize.wait_human(5, 2)
+                jsfile = f"{self.root_app}{os.path.sep}js{os.path.sep}login.js"
+                with open(jsfile, 'r') as f:
+                        ctc = Template(f.read())
+                        scrpt = ctc.substitute(login=login, password=password, url=url, urlbase=urlbase,
+                                                sec_ch_ua=self.jsprms.prms['sec_ch_ua'].replace('#','\\"'))
+                # print (scrpt)
+                res = self.driver.execute_script(scrpt)
+                # print (f"Resultat = {res}")
