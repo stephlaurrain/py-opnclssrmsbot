@@ -58,41 +58,38 @@ while True:
     menulist = []
     menulist.append(Menuitem("simplyconnect", "simply connect", 0, False))
     menulist.append(Menuitem("getsessions", "get sessions elements", 0, False))
-    menulist.append(Menuitem("login", "login to OpnClssrms", 0, False))
+    # menulist.append(Menuitem("login", "login to OpnClssrms", 0, False))
     menulist.append(Menuitem("dash", "dashboard", 0, False))
-    menulist.append(Menuitem("booked", "planifiees", 0, False))
+    # menulist.append(Menuitem("booked", "planifiees", 0, False))
 
 
-    menulist.append(Menuitem("test", "test", 0, False))
+    # menulist.append(Menuitem("test", "test", 0, False))
 
     for idx, menuitem in enumerate(menulist):
         print (mencol(idx, menuitem.command, menuitem.label))
         if menuitem.ret:
             print(drkcol("#####"))
 
-    print(drkcol("#####"))
-    print(mencol("55", "tail", "actual default log"))
+    # print(drkcol("#####"))
+    # print(mencol("55", "tail", "actual default log"))
 
     print(drkcol("#####"))
-    print(mencol("66", "advanced", "advanced menu"))
-    print(mencol("77", "desktop", "desktop menu"))
-    print(mencol("88", "default", "default menu"))
-    print(drkcol("#####"))
+    # print(mencol("66", "advanced", "advanced menu"))
+    # print(mencol("77", "desktop", "desktop menu"))
+    # print(mencol("88", "default", "default menu"))
+    # print(drkcol("#####"))
     print(mencol("93", "editparams", "edit default.json"))
     # print (mencol("94","editparams","edit checkvisited.json"))    
-    print(mencol("98", "stop", "stop current process"))
+    # print(mencol("98", "stop", "stop current process"))
     print(mencol("99", "exit", "exit this menu"))
     dothat = input(drkcol("\n\nReady to rock : "))
 
     today = datetime.now()
     dnow = today.strftime(r"%y%m%d")
-
-    if dothat == "55":
-        print(drkcol("\ntail -f default\n"))
-        dotail("default")
+  
     if dothat == "93":
         print(drkcol("\edit params -r\n"))
-        os.system("nano data/default.json")    
+        os.system("nano data/conf/default.json")    
     if dothat == "99":
         print(drkcol("\nsee you soon, Neo\n"))
         bot.driver.close()

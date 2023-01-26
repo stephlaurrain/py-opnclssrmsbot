@@ -54,9 +54,7 @@ class Bot:
                 for session in sessions:
                         # print(f"#{id_session}# / #{session['id']}#")
                         if str(session['id']) == id_session:
-                                #print ('EGAL')
                                 return session
-
 
         @_trace_decorator        
         @_error_decorator()
@@ -92,17 +90,11 @@ class Bot:
                                 print(student['email'])
                                 print(student['firstName']) 
                                 print(student['lastName'])                                                        
-                                
-                                
-                                # mentoring = self.dojs.get_mentorings(id_mentoring)    
                                 sessions = self.dojs.get_sessions()
-                                # print(sessions)
                                 session = self.getsession_by_id(id_session, sessions)
                                 
-                                print(session['videoConference']['id'] ) 
+                                # print(session['videoConference']['id'] ) 
                                 visio_id = session['videoConference']['id']                           
-                                ##print(mentoring['videoConference']['id'])   
-                                
                                 visio_url = Template(self.urls.get_url('meet')).substitute(base=self.urls.get_url('base'),id=visio_id)                                
                                 with open(tpl_report, 'r') as f:                                                                        
                                         reptmpl = Template(f.read())
