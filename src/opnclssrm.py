@@ -36,29 +36,29 @@ class Bot:
                 
 
         def trace(self,tracestk):
-                #print ("{0} ({1}-{2})".format(stck.function, stck.filename, stck.lineno))
-                # print ("{0}".format(stck.function))
-                # self.log.lg(f"{stck.function} -{stck1.function}")
-                res=''
-                for trace in tracestk:
-                        res += f"{trace.function} - "
-                        self.log.lg(f"{res}")
+                #print ("{0} ({1}-{2})".format(stck.function, stck.filename, stck.lineno))                
+                self.log.lg(f"{tracestk[0].function}")
+                #res=''
+                #for trace in tracestk:
+                #        res += f"{trace.function} - "
+                #        self.log.lg(f"{res}")
         
         def newtab(self,url):            
                 self.driver.execute_script("window.open('{0}');".format(url))
                 self.driver.switch_to.window(self.driver.window_handles[-1]) 
 
-        @_trace_decorator        
+        
         @_error_decorator()
         def getsession_by_id(self, id_session, sessions):
+                self.trace(inspect.stack())
                 for session in sessions:
                         # print(f"#{id_session}# / #{session['id']}#")
                         if str(session['id']) == id_session:
                                 return session
-
-        @_trace_decorator        
+        
         @_error_decorator()
-        def getsessions(self):                                
+        def getsessions(self):    
+                self.trace(inspect.stack())                            
                 url_dashboard = Template(self.urls.get_url('dashboard')).substitute(base=self.urls.get_url('base'))
                 self.driver.get(url_dashboard)
                 WebDriverWait(self.driver, 15).until(EC.presence_of_element_located((By.ID, 'scheduled')))      
@@ -115,9 +115,10 @@ class Bot:
                 self.driver.get(f'file:{res_file}')
                 # You can use (Keys.CONTROL + 't') on other OSs
 
-        @_trace_decorator        
-        @_error_decorator()
+
+        @_error_decorator()        
         def login(self, login, password):
+                self.trace(inspect.stack())
                 url = Template(self.urls.get_url('login')).substitute(base=self.urls.get_url('base'))
                 self.driver.get(url)                        
                 self.waithuman(2,5)                                          
@@ -134,10 +135,10 @@ class Bot:
                 print("send_keys")
                 element.send_keys (password)
 
-        # init
-        @_trace_decorator        
+        # init        
         @_error_decorator(do_raise=True)
-        def init(self):                          
+        def init(self):    
+                self.trace(inspect.stack())                      
                 options = webdriver.ChromeOptions()
                 if (self.jsprms.prms['headless']):
                         options.add_argument("--headless")
@@ -164,9 +165,10 @@ class Bot:
                 driver.implicitly_wait(self.jsprms.prms['implicitly_wait'])
                 return driver
         
-        @_trace_decorator        
+        
         @_error_decorator()
         def remove_logs(self):
+                self.trace(inspect.stack())
                 keep_log_time = self.jsprms.prms['keep_log_time']
                 keep_log_unit = self.jsprms.prms['keep_log_unit']
                 self.log.lg(f"=>clean logs older than {keep_log_time} {keep_log_unit}")                        
@@ -189,9 +191,10 @@ class Bot:
                         self.log.errlg(f"Wasted ! : {e}")
                         raise                         
 
-        @_trace_decorator        
+        
         @_error_decorator(do_raise=True)
         def testpath(self):
+                self.trace(inspect.stack())
                 url = Template(self.urls.get_url('dashboard')).substitute(base=self.urls.get_url('base')) 
                 self.driver.get(url)
                 mypath=input("Enter xpath : ")
@@ -271,14 +274,3 @@ class Bot:
                 finally:
                         # self.driver.close()
                         print("==>> DONE <<==")
-
-
-              
-               
-    
-
-        
-                
-
-        
-

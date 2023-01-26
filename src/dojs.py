@@ -4,6 +4,8 @@ from string import Template
 from utils.mydecorators import _error_decorator, _trace_decorator
 import utils.file_utils as file_utils
 from datetime import datetime, timedelta
+import inspect
+
 
 class Dojs:
 
@@ -15,10 +17,10 @@ class Dojs:
                 self.humanize = humanize
                 self.urls = urls
                 self.root_app = os.getcwd()
-
-        @_trace_decorator    
+        
         @_error_decorator()
         def get_events(self):        
+                self.trace(inspect.stack())
                 url = Template(self.urls.get_url('events')).substitute(api=self.urls.get_url('api'), id=str(self.jsprms.prms['my_id']))                           
                 token_key = self.jsprms.prms['token_key']
                 jsfile = f"{self.root_app}{os.path.sep}js{os.path.sep}events.js"
@@ -29,10 +31,10 @@ class Dojs:
                 res = self.driver.execute_script(scrpt)
                 file_utils.str_to_textfile("resultevents.json", json.dumps(res))
                 return res
-        
-        @_trace_decorator    
+                
         @_error_decorator()
-        def get_sessions(self):                                                          
+        def get_sessions(self):
+                self.trace(inspect.stack())                                                   
                 date_filter = f'{(datetime.now()- timedelta(hours=10)).strftime("%Y-%m-%dT%H:%M:%S")}Z'
                 url = Template(self.urls.get_url('sessions')).substitute(api=self.urls.get_url('api'), id=str(self.jsprms.prms['my_id']), dateafter=date_filter)                  
                 # {"date":"2022-09-27T15:44:00"},
@@ -48,10 +50,10 @@ class Dojs:
                 res = self.driver.execute_script(scrpt)
                 file_utils.str_to_textfile("resultsessions.json", json.dumps(res))
                 return res
-                
-        @_trace_decorator    
+                        
         @_error_decorator()
-        def get_mentorings(self, id_mentoring):                  
+        def get_mentorings(self, id_mentoring):    
+                self.trace(inspect.stack())              
                 url = Template(self.urls.get_url('mentorings')).substitute(api=self.urls.get_url('api'), id_mentoring=id_mentoring)                
                 token_key = self.jsprms.prms['token_key']
                 jsfile = f"{self.root_app}{os.path.sep}js{os.path.sep}mentorings.js"
@@ -63,10 +65,10 @@ class Dojs:
                 file_utils.str_to_textfile("resultmentorings.json", json.dumps(res))
                 return res
         
-        
-        @_trace_decorator    
+                
         @_error_decorator()
         def login(self, login, password):
+                self.trace(inspect.stack())
                 urlbase = Template(self.urls.get_url('login')).substitute(base=self.urls.get_url('base'))
                 self.driver.get(urlbase)
                 url = Template(self.urls.get_url('login_check')).substitute(base=self.urls.get_url('base'))
