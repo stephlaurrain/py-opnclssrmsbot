@@ -19,6 +19,7 @@ from utils.humanize import Humanize
 from dojs import Dojs
 
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -34,14 +35,28 @@ class Bot:
         #def __init__(self):                
                 
 
-        def trace(self,stck):
+        def trace(self,tracestk):
                 #print ("{0} ({1}-{2})".format(stck.function, stck.filename, stck.lineno))
                 # print ("{0}".format(stck.function))
-                self.log.lg("{0}".format(stck.function))
+                # self.log.lg(f"{stck.function} -{stck1.function}")
+                res=''
+                for trace in tracestk:
+                        res += f"{trace.function} - "
+                        self.log.lg(f"{res}")
         
         def newtab(self,url):            
                 self.driver.execute_script("window.open('{0}');".format(url))
                 self.driver.switch_to.window(self.driver.window_handles[-1]) 
+
+        @_trace_decorator        
+        @_error_decorator()
+        def getsession_by_id(self, id_session, sessions):
+                for session in sessions:
+                        # print(f"#{id_session}# / #{session['id']}#")
+                        if str(session['id']) == id_session:
+                                #print ('EGAL')
+                                return session
+
 
         @_trace_decorator        
         @_error_decorator()
@@ -67,13 +82,27 @@ class Bot:
                         truedate = truedate + timedelta(hours=offset_hour)
                         truedate_as_str = truedate.strftime("%d-%m-%Y à %H:%Mh")
                         if datetime.now() <= truedate:
-                                id_mentoring = event['id'].split('-')[1]
-                                # print(id_mentoring) # print(event['type']) # print(event['startDate']) # print(truedate)
+                                full_session_id = event['id'].rsplit('-', 1)
+                                session_type = full_session_id[0]
+                                id_session = full_session_id[1]
+                                print(session_type)
+                                #print(id_session) # print(event['type']) # print(event['startDate']) # print(truedate)
                                 student = event['attendees'][0]                        
-                                # print(student['displayName']) # print(student['email']) # print(student['firstName']) # print(student['lastName'])                                                        
-                                mentoring = self.dojs.get_mentorings(id_mentoring)    
-                                visio_id = mentoring['videoConference']['id']                           
-                                # print(mentoring['videoConference']['id'])   
+                                print(student['displayName']) 
+                                print(student['email'])
+                                print(student['firstName']) 
+                                print(student['lastName'])                                                        
+                                
+                                
+                                # mentoring = self.dojs.get_mentorings(id_mentoring)    
+                                sessions = self.dojs.get_sessions()
+                                # print(sessions)
+                                session = self.getsession_by_id(id_session, sessions)
+                                
+                                print(session['videoConference']['id'] ) 
+                                visio_id = session['videoConference']['id']                           
+                                ##print(mentoring['videoConference']['id'])   
+                                
                                 visio_url = Template(self.urls.get_url('meet')).substitute(base=self.urls.get_url('base'),id=visio_id)                                
                                 with open(tpl_report, 'r') as f:                                                                        
                                         reptmpl = Template(f.read())
@@ -82,14 +111,15 @@ class Bot:
                                                 resmess = messtmpl.substitute(student, event_type=event['type'], visio_url=visio_url, truedate=truedate_as_str)
                                                 # print(resmess)
                                         resrep += reptmpl.substitute(message=resmess)
+
                                 if cpt == limit:
-                                        break;
+                                         break;
                                 cpt +=1
                         res_file = f"{self.root_app}{os.path.sep}data{os.path.sep}results.txt"
                         with open(res_file, "w") as text_file:
                                 text_file.write(resrep)
-                self.driver.execute_script(f"window.open('file:{res_file}','_blank');");
-                self.driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.COMMAND + 't') 
+                ## self.driver.execute_script(f"window.open('file:{res_file}','_blank');");
+                ## self.driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.COMMAND + 't') 
                 self.driver.get(f'file:{res_file}')
                 # You can use (Keys.CONTROL + 't') on other OSs
 
@@ -131,10 +161,10 @@ class Bot:
                         options.add_argument("--disable-dev-shm-usage")
                         options.add_argument("--disable-gpu")
                         prefs = {"profile.managed_default_content_settings.images": 2}
-                        options.add_experimental_option("prefs", prefs)
-                options.add_argument(f"user-agent={self.jsprms.prms['user_agent']}")
+                        options.add_experimental_option("prefs", prefs)                
                 options.add_argument("--start-maximized")
-                driver = webdriver.Chrome(executable_path=self.chromedriver_bin_path, options=options)
+                # driver = webdriver.Chrome(executable_path=self.chromedriver_bin_path, options=options)
+                driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)        
                 # anti bot detection                
                 driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
                 # resout le unreachable
@@ -155,10 +185,10 @@ class Bot:
                         self.root_app = os.getcwd()
                         self.log = mylog.Log()
                         self.log.init(jsonfile)                     
-                        self.trace(inspect.stack()[0])                        
+                        self.trace(inspect.stack())                        
                         jsonFn = f"{self.root_app}{os.path.sep}data{os.path.sep}conf{os.path.sep}{jsonfile}.json"
                         self.jsprms = jsonprms.Prms(jsonFn)
-                        self.chromedriver_bin_path = self.jsprms.prms['chromedriver']
+                                        
                         self.test = self.jsprms.prms['test']
                         self.remove_logs()
                         self.log.lg("=Here I am=")                
@@ -212,7 +242,11 @@ class Bot:
                                 # print(url)
                                 self.driver.get(url)
                         if (command=="getsessions"):
-                                self.getsessions()
+                                try :
+                                        self.getsessions()
+                                except:
+                                        pass
+                                        # self.driver.close()
                         if (command=="login"):   
                                 # self.login(self.jsprms.prms['login'],self.jsprms.prms['password'])  
                                 self.dojs.login(self.jsprms.prms['login'],self.jsprms.prms['password'])  

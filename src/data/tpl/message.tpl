@@ -1,9 +1,8 @@
-
-$email
-
-$displayName
+$displayName / $event_type
 
 OpenClassrooms : lien visio
+
+$email
 
 Bonjour $firstName,
 
@@ -19,5 +18,4 @@ Stéphane
 
 laurrains@gmail.com
 
-
-Sent from my PyOpnclssrm Bot
+=======================================

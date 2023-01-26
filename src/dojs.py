@@ -33,17 +33,18 @@ class Dojs:
         @_trace_decorator    
         @_error_decorator()
         def get_sessions(self):                                                          
-                url = Template(self.urls.get_url('sessions')).substitute(api=self.urls.get_url('api'), id=str(self.jsprms.prms['my_id']))                  
+                date_filter = f'{(datetime.now()- timedelta(hours=10)).strftime("%Y-%m-%dT%H:%M:%S")}Z'
+                url = Template(self.urls.get_url('sessions')).substitute(api=self.urls.get_url('api'), id=str(self.jsprms.prms['my_id']), dateafter=date_filter)                  
                 # {"date":"2022-09-27T15:44:00"},
-                date_filter = (datetime.now()- timedelta(hours=10)).strftime("%Y-%m-%dT%H:%M:%S")
-                url = url.replace('[date]',date_filter)                              
+                # print(url)
+                #url = url.replace('[date]',date_filter)                              
                 token_key = self.jsprms.prms['token_key']
                 jsfile = f"{self.root_app}{os.path.sep}js{os.path.sep}sessions.js"
                 with open(jsfile, 'r') as f:
                         ctc = Template(f.read())
                         scrpt = ctc.substitute(url=url, tokenkey=token_key)
                 # print (scrpt)
-                input("wait 4 key")
+                # input("wait 4 key")
                 res = self.driver.execute_script(scrpt)
                 file_utils.str_to_textfile("resultsessions.json", json.dumps(res))
                 return res
