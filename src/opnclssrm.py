@@ -13,7 +13,7 @@ from warnings import catch_warnings
 import utils.mylog as mylog
 import utils.str_utils as str_utils
 import utils.file_utils as file_utils
-from utils.mydecorators import _error_decorator, _trace_decorator
+from utils.mydecorators import _error_decorator
 import utils.jsonprms as jsonprms
 from utils.humanize import Humanize
 from dojs import Dojs

@@ -1,7 +1,7 @@
 import os
 import json
 from string import Template
-from utils.mydecorators import _error_decorator, _trace_decorator
+from utils.mydecorators import _error_decorator
 import utils.file_utils as file_utils
 from datetime import datetime, timedelta
 import inspect
